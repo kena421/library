@@ -59,28 +59,9 @@ def return_book(request):
     else:
         return JsonResponse({ 'message': 'Unable to return book'})
         
-@csrf_exempt
-@require_POST
-def fulfill(request):
-    data = json.loads(request.body)
-    book_id = data.get('book_id')
-    date = data.get('date')
-    
-    date = datetime.strptime(date, "%Y-%m-%d").date()
-    if None in [book_id, date]:
-        return HttpResponseBadRequest('Invalid data')
-
-    assigned = ReservationService.assign_book_if_reserved(book_id, date)
-    
-    if assigned:
-        return JsonResponse({ 'message': 'Successfully fulfilled'})
-    else:
-        return JsonResponse({ 'message': 'Unable to fulfill'})
-
 from datetime import timedelta
 
-@csrf_exempt
-@require_POST
+@require_GET
 def check_overdue(request):
     data = json.loads(request.body)
     member_id = data.get('member_id')

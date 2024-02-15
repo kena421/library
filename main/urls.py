@@ -7,5 +7,4 @@ urlpatterns = [
     path('checkout', checkout),
     path('return', return_book),
     path('overdue', check_overdue)
-    
 ]

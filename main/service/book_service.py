@@ -14,8 +14,11 @@ class BookService:
             if circulated_book:
                 circulated_book.returned = True
                 book = Book.objects.filter(id=book_id).first()
-                book.num_copies += 1
-                book.save()
+                assigned = ReservationService.assign_book_if_reserved(book_id, date)
+                if not assigned:
+                    book.num_copies += 1
+                    book.save()
+                    
                 circulated_book.save()
                 return True
             else:

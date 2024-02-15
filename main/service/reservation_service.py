@@ -19,21 +19,22 @@ class ReservationService:
     def popfirst_reserved_member(cls, book_id):
         reservation = Reservation.objects.select_for_update().filter(book_id=book_id).order_by('id').first()
         with transaction.atomic():
-            member_id = reservation.member_id
-            reservation.delete()
-            return member_id
+            if reservation:
+                member_id = reservation.member_id
+                reservation.delete()
+                return member_id
         return None
     
     @classmethod
     def assign_book_if_reserved(cls, book_id, date):
         from main.service.book_service import BookService
-        book = Book.objects.select_for_update().filter(id=book_id, num_copies__gt = 0).first()
-    
         with transaction.atomic():
-            if not book: return False
-            member_id = cls.popfirst_reserved_member(book_id)
-            BookService.assign_book(book_id, member_id, date)
-            return True
+            member_id =  cls.popfirst_reserved_member(book_id)
+            if member_id:
+                BookService.assign_book(book_id, member_id, date)
+                return True
+            else:
+                return False
         
         
                 
